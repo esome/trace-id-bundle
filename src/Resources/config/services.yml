@@ -1,0 +1,28 @@
+parameters:
+    trace_id_header_field: 'X-ELI-TRACE-ID'
+    trace_id_log_field: 'ELI-TRACE-ID'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    esome\TraceIdBundle\Services\TraceId:
+        lazy: true
+        arguments:
+            - "%trace_id_header_field%"
+
+    esome\TraceIdBundle\EventListener\TraceIdTagLogInjector:
+        lazy: true
+        arguments:
+            - "%trace_id_log_field%"
+        tags:
+            - { name: monolog.processor, method: processRecord }
+
+    esome\TraceIdBundle\EventListener\TraceIdTagResponseHeaderInjector:
+        lazy: true
+        arguments:
+            - "%trace_id_header_field%"
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
