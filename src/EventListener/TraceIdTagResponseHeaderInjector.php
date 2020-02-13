@@ -3,7 +3,7 @@
 namespace esome\TraceIdBundle\EventListener;
 
 use esome\TraceIdBundle\Services\TraceId;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class TraceIdTagResponseHeaderInjector
 {
@@ -21,9 +21,9 @@ class TraceIdTagResponseHeaderInjector
     }
 
     /**
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
         $response->headers->set($this->traceIdHeaderField, $this->traceIdProvider->getTraceId());
