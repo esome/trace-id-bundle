@@ -1,6 +1,6 @@
 parameters:
-    trace_id_header_field: 'X-ELI-TRACE-ID'
-    trace_id_log_field: 'ELI-TRACE-ID'
+    trace_id_header_field: 'X-Trace-Id'
+    trace_id_log_field: 'trace-id'
 
 services:
     _defaults:
@@ -8,7 +8,7 @@ services:
         autoconfigure: true
         public: false
 
-    esome\TraceIdBundle\Services\TraceId:
+    esome\TraceIdBundle\Services\TraceIdProvider:
         lazy: true
         arguments:
             - "%trace_id_header_field%"
@@ -26,3 +26,9 @@ services:
             - "%trace_id_header_field%"
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    esome\TraceIdBundle\Client\TraceableHttpClient:
+        arguments:
+            $httpClient: '@.inner'
+            $traceIdProvider: '@esome\TraceIdBundle\Services\TraceIdProvider'
+        decorates: 'http_client'

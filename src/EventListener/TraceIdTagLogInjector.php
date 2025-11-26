@@ -2,37 +2,18 @@
 
 namespace esome\TraceIdBundle\EventListener;
 
-use esome\TraceIdBundle\Services\TraceId;
+use esome\TraceIdBundle\Services\TraceIdProvider;
+use Monolog\LogRecord;
 
-/**
- * Class LogTrackProcessor
- * @package AppBundle\Helper
- */
-class TraceIdTagLogInjector
+readonly class TraceIdTagLogInjector
 {
-
-    /** @var string */
-    private $traceIdLogField;
-
-    /** @var string */
-    protected $traceId;
-
-    public function __construct(string $traceIdLogField, TraceId $traceIdProvider)
+    public function __construct(private string $traceIdLogField, private TraceIdProvider $traceIdProvider)
     {
-        $this->traceIdLogField = $traceIdLogField;
-        $this->traceId = $traceIdProvider->getTraceId();
     }
 
-    /**
-     * Process single log record
-     *
-     * @param array $record
-     * @return array
-     */
-    public function processRecord(array $record)
+    public function processRecord(LogRecord $record): LogRecord
     {
-        $record['extra'][$this->traceIdLogField] = $this->traceId;
-
+        $record->extra[$this->traceIdLogField] = $this->traceIdProvider->getTraceId();
         return $record;
     }
 }

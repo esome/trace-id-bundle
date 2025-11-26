@@ -2,28 +2,16 @@
 
 namespace esome\TraceIdBundle\EventListener;
 
-use esome\TraceIdBundle\Services\TraceId;
+use esome\TraceIdBundle\Services\TraceIdProvider;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
-class TraceIdTagResponseHeaderInjector
+readonly class TraceIdTagResponseHeaderInjector
 {
-
-    /** @var string */
-    private $traceIdHeaderField;
-
-    /** @var TraceId */
-    private $traceIdProvider;
-
-    public function __construct(string $traceIdHeaderField, TraceId $traceIdProvider)
+    public function __construct(private string $traceIdHeaderField, private TraceIdProvider $traceIdProvider)
     {
-        $this->traceIdHeaderField = $traceIdHeaderField;
-        $this->traceIdProvider = $traceIdProvider;
     }
 
-    /**
-     * @param ResponseEvent $event
-     */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         $response->headers->set($this->traceIdHeaderField, $this->traceIdProvider->getTraceId());
